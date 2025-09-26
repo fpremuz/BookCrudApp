@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using BookCrudApi.Data;
+using BookCrudApi.Models;
 
 namespace BookCrudApi.Controllers
 {
@@ -6,53 +9,79 @@ namespace BookCrudApi.Controllers
     [Route("[controller]")]
     public class BooksController : ControllerBase
     {
-        private static List<Book> Books = new List<Book>();
+        private readonly AppDbContext _context;
+
+        public BooksController(AppDbContext context)
+        {
+            _context = context;
+        }
 
         [HttpGet]
-        public IEnumerable<Book> Get() => Books;
+        public async Task<ActionResult<IEnumerable<Book>>> Get()
+        {
+            return await _context.Books.ToListAsync();
+        }
 
         [HttpGet("{id}")]
-        public ActionResult<Book> Get(int id)
+        public async Task<ActionResult<Book>> Get(int id)
         {
-            var book = Books.FirstOrDefault(b => b.Id == id);
+            var book = await _context.Books.FindAsync(id);
             if (book == null) return NotFound();
             return book;
         }
 
         [HttpPost]
-        public ActionResult<Book> Post([FromBody] Book book)
+        public async Task<ActionResult<Book>> Post([FromBody] Book book)
         {
-            book.Id = Books.Count > 0 ? Books.Max(b => b.Id) + 1 : 1;
-            Books.Add(book);
+            _context.Books.Add(book);
+            await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(Get), new { id = book.Id }, book);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] Book book)
+        public async Task<IActionResult> Put(int id, [FromBody] Book book)
         {
-            var existing = Books.FirstOrDefault(b => b.Id == id);
-            if (existing == null) return NotFound();
-            existing.Title = book.Title;
-            existing.Author = book.Author;
-            existing.Pages = book.Pages;
+            if (id != book.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(book).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!BookExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var book = Books.FirstOrDefault(b => b.Id == id);
+            var book = await _context.Books.FindAsync(id);
             if (book == null) return NotFound();
-            Books.Remove(book);
+
+            _context.Books.Remove(book);
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
-    }
 
-    public class Book
-    {
-        public int Id { get; set; }
-        public string Title { get; set; } = "";
-        public string Author { get; set; } = "";
-        public int Pages { get; set; }
+        private bool BookExists(int id)
+        {
+            return _context.Books.Any(e => e.Id == id);
+        }
     }
 }
