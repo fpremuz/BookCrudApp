@@ -1,6 +1,16 @@
 import { Book, CreateBookRequest, UpdateBookRequest } from '../types/Book';
 
-const API_BASE_URL = 'http://localhost:5239/books';
+// Get API base URL from environment variable with fallback
+const getApiBaseUrl = (): string => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+  if (!apiUrl) {
+    console.warn('REACT_APP_API_URL environment variable is not set. Using default localhost URL.');
+    return 'http://localhost:5239/books';
+  }
+  return `${apiUrl}/books`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export const booksApi = {
   // Get all books

@@ -49,4 +49,4 @@ using (var scope = app.Services.CreateScope())
     context.Database.EnsureCreated();
 }
 
-app.Run("http://localhost:5239");
+app.Run();
