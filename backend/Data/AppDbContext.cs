@@ -22,6 +22,15 @@ namespace BookCrudApi.Data
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.Author).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.Pages).IsRequired();
+                
+                // Configure embedding JSON column
+                entity.Property(e => e.EmbeddingJson)
+                    .HasMaxLength(10000) // JSON string for embedding
+                    .HasDefaultValue(null);
+                    
+                entity.Property(e => e.Summary)
+                    .HasMaxLength(1000)
+                    .HasDefaultValue(null);
             });
         }
     }

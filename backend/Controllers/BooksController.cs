@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookCrudApi.Data;
 using BookCrudApi.Models;
+using BookCrudApi.Services;
 
 namespace BookCrudApi.Controllers
 {
@@ -10,10 +11,12 @@ namespace BookCrudApi.Controllers
     public class BooksController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IEmbeddingService _embeddingService;
 
-        public BooksController(AppDbContext context)
+        public BooksController(AppDbContext context, IEmbeddingService embeddingService)
         {
             _context = context;
+            _embeddingService = embeddingService;
         }
 
         [HttpGet]
@@ -77,6 +80,39 @@ namespace BookCrudApi.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Book>>> Search([FromQuery] string q)
+        {
+            if (string.IsNullOrWhiteSpace(q))
+            {
+                return BadRequest("Query parameter 'q' is required");
+            }
+
+            try
+            {
+                var books = await _embeddingService.SearchSimilarBooksAsync(q, 5);
+                return Ok(books);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error searching books: {ex.Message}");
+            }
+        }
+
+        [HttpPost("generate-embeddings")]
+        public async Task<IActionResult> GenerateEmbeddings()
+        {
+            try
+            {
+                await _embeddingService.GenerateAndStoreEmbeddingsAsync();
+                return Ok("Embeddings generated successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error generating embeddings: {ex.Message}");
+            }
         }
 
         private bool BookExists(int id)

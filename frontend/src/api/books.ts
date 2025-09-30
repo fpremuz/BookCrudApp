@@ -70,4 +70,23 @@ export const booksApi = {
       throw new Error('Failed to delete book');
     }
   },
+
+  // AI-powered search
+  searchBooks: async (query: string): Promise<Book[]> => {
+    const response = await fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(query)}`);
+    if (!response.ok) {
+      throw new Error('Failed to search books');
+    }
+    return response.json();
+  },
+
+  // Generate embeddings for all books
+  generateEmbeddings: async (): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/generate-embeddings`, {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to generate embeddings');
+    }
+  },
 };

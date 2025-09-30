@@ -5,6 +5,7 @@ A fullstack CRUD application for managing books built with React (frontend) and 
 
 ## Features
 - **Full CRUD Operations**: List, Add, Edit, and Delete books
+- **AI-Powered Search**: Semantic search using free open-source embeddings
 - **Persistent Storage**: Using Entity Framework Core with PostgreSQL
 - **API-First Architecture**: Fully separated frontend and backend with CORS enabled
 - **Environment Configuration**: Secure handling of secrets and configurable URLs
@@ -23,6 +24,7 @@ A fullstack CRUD application for managing books built with React (frontend) and 
 - **ASP.NET Core 8** - Modern web framework
 - **Entity Framework Core 8.0.0** - ORM for database operations
 - **Npgsql 8.0.0** - PostgreSQL provider for EF Core
+- **Hugging Face API** - Free AI embeddings for semantic search
 - **Swagger/OpenAPI** - API documentation
 
 ### Database
@@ -44,7 +46,8 @@ BookCrudApp/
 │   │   ├── components/      # React components
 │   │   │   ├── BookList.tsx # Book listing component
 │   │   │   ├── AddBook.tsx  # Add book form
-│   │   │   └── EditBook.tsx # Edit book form
+│   │   │   ├── EditBook.tsx # Edit book form
+│   │   │   └── SearchBooks.tsx # AI-powered search component
 │   │   ├── types/           # TypeScript type definitions
 │   │   │   └── Book.ts      # Book interface
 │   │   ├── App.tsx          # Main application component
@@ -59,6 +62,8 @@ BookCrudApp/
 │   │   └── AppDbContext.cs
 │   ├── Models/             # Data models
 │   │   └── Book.cs
+│   ├── Services/           # Business logic services
+│   │   └── EmbeddingService.cs # AI embedding service
 │   ├── Migrations/         # EF Core migrations
 │   ├── Properties/         # Configuration files
 │   │   └── launchSettings.json
@@ -147,6 +152,29 @@ The backend uses Kestrel configuration in `appsettings.json`:
 }
 ```
 
+## AI-Powered Search Features
+
+### How It Works
+The application uses **Hugging Face's free API** with the `sentence-transformers/all-MiniLM-L6-v2` model to generate embeddings for semantic search. This enables users to search for books using natural language queries.
+
+### Setup for AI Features
+
+1. **Generate Embeddings**: 
+   - Navigate to the "AI Search" page in the frontend
+   - Click "Generate AI Embeddings" to create embeddings for all existing books
+   - This process uses the free Hugging Face API (no API key required)
+
+2. **Search Books**:
+   - Use the search bar to find books by content, genre, or topic
+   - The AI will return the most semantically similar books
+   - Results are ranked by similarity score
+
+### Technical Details
+- **Embedding Model**: `sentence-transformers/all-MiniLM-L6-v2` (384 dimensions)
+- **Similarity Algorithm**: Cosine similarity
+- **Storage**: Embeddings stored as JSON in PostgreSQL
+- **API**: Free Hugging Face Inference API (no authentication required)
+
 ## API Endpoints
 
 | Method | Endpoint | Description |
@@ -156,6 +184,8 @@ The backend uses Kestrel configuration in `appsettings.json`:
 | POST | `/books` | Create a new book |
 | PUT | `/books/{id}` | Update a book |
 | DELETE | `/books/{id}` | Delete a book |
+| GET | `/books/search?q={query}` | AI-powered semantic search |
+| POST | `/books/generate-embeddings` | Generate embeddings for all books |
 
 ### Request/Response Examples
 

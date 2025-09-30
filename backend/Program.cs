@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using BookCrudApi.Data;
+using BookCrudApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,13 @@ if (!string.IsNullOrEmpty(connectionString))
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+// Add HTTP client for AI services
+builder.Services.AddHttpClient<IEmbeddingService, EmbeddingService>();
+
+// Register embedding service
+builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
