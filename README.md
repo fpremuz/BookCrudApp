@@ -217,5 +217,104 @@ dotnet publish -c Release
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+## Deployment
+
+### Backend Deployment (Render)
+
+1. **Connect to Render**:
+   - Sign up at [render.com](https://render.com)
+   - Connect your GitHub repository
+   - Select "New Web Service"
+
+2. **Configure Backend Service**:
+   - **Build Command**: `cd backend && dotnet publish -c Release -o /app/publish`
+   - **Start Command**: `cd backend && dotnet backend.dll`
+   - **Environment**: Docker
+   - **Dockerfile Path**: `./backend/Dockerfile`
+
+3. **Set Environment Variables**:
+   ```
+   ASPNETCORE_ENVIRONMENT=Production
+   ASPNETCORE_URLS=http://0.0.0.0:8080
+   DB_HOST=<your-postgres-host>
+   DB_PORT=5432
+   DB_NAME=<your-database-name>
+   DB_USER=<your-database-user>
+   DB_PASSWORD=<your-database-password>
+   ```
+
+4. **Database Setup**:
+   - Create a PostgreSQL database on Render
+   - Use the connection details in your environment variables
+
+### Frontend Deployment (Vercel)
+
+1. **Connect to Vercel**:
+   - Sign up at [vercel.com](https://vercel.com)
+   - Connect your GitHub repository
+   - Select the `frontend` folder as the root directory
+
+2. **Configure Environment Variables**:
+   ```
+   REACT_APP_API_URL=https://your-backend-url.onrender.com
+   ```
+
+3. **Build Settings**:
+   - **Framework Preset**: Create React App
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `build`
+
+### Manual Deployment Steps
+
+#### Backend (Render)
+```bash
+# 1. Push your code to GitHub
+git add .
+git commit -m "Deploy to production"
+git push origin main
+
+# 2. In Render dashboard:
+# - Create new Web Service
+# - Connect GitHub repository
+# - Set build and start commands
+# - Configure environment variables
+```
+
+#### Frontend (Vercel)
+```bash
+# 1. Install Vercel CLI
+npm i -g vercel
+
+# 2. Deploy from frontend directory
+cd frontend
+vercel
+
+# 3. Set environment variables in Vercel dashboard
+# REACT_APP_API_URL=https://your-backend-url.onrender.com
+```
+
+### Production URLs
+- **Backend API**: `https://bookcrudapp-backend.onrender.com`
+- **Frontend App**: `https://bookcrudapp-frontend.vercel.app`
+- **API Documentation**: `https://bookcrudapp-backend.onrender.com/swagger`
+
+### Environment Variables Reference
+
+#### Backend (Render)
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `ASPNETCORE_ENVIRONMENT` | Environment setting | `Production` |
+| `ASPNETCORE_URLS` | Server binding | `http://0.0.0.0:8080` |
+| `DB_HOST` | Database host | `dpg-xxxxx-a.oregon-postgres.render.com` |
+| `DB_PORT` | Database port | `5432` |
+| `DB_NAME` | Database name | `bookcrudapp` |
+| `DB_USER` | Database user | `bookcrudapp_user` |
+| `DB_PASSWORD` | Database password | `auto-generated` |
+
+#### Frontend (Vercel)
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `REACT_APP_API_URL` | Backend API URL | `https://bookcrudapp-backend.onrender.com` |
+
 ## Support
 For support and questions, please open an issue in the GitHub repository.

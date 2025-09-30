@@ -1,0 +1,47 @@
+services:
+  # Backend API Service
+  - type: web
+    name: bookcrudapp-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:8080
+      - key: DB_HOST
+        fromDatabase:
+          name: bookcrudapp-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: bookcrudapp-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: bookcrudapp-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: bookcrudapp-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: bookcrudapp-db
+          property: password
+
+  # PostgreSQL Database
+  - type: pserv
+    name: bookcrudapp-db
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    envVars:
+      - key: POSTGRES_DB
+        value: bookcrudapp
+      - key: POSTGRES_USER
+        value: bookcrudapp_user
+      - key: POSTGRES_PASSWORD
+        generateValue: true
