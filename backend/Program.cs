@@ -11,6 +11,8 @@ builder.Services.AddControllers();
 
 // Add Entity Framework with environment variable substitution
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
 if (!string.IsNullOrEmpty(connectionString))
 {
     // Replace environment variables in connection string
