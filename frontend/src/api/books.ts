@@ -4,10 +4,10 @@ import { Book, CreateBookRequest, UpdateBookRequest } from '../types/Book';
 const getApiBaseUrl = (): string => {
   const apiUrl = process.env.REACT_APP_API_URL;
   if (!apiUrl) {
-    console.warn('REACT_APP_API_URL environment variable is not set. Using default localhost URL.');
-    return 'http://localhost:5239/books';
+    console.warn('REACT_APP_API_URL is not set. Using default localhost URL.');
+    return 'http://localhost:5239';
   }
-  return `${apiUrl}/books`;
+  return apiUrl;
 };
 
 const API_BASE_URL = getApiBaseUrl();

@@ -36,11 +36,20 @@ builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
-app.UseCors("AllowFrontend");
+app.UseCors("AllowAll");
 
 if (app.Environment.IsDevelopment())
 {
