@@ -49,8 +49,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseCors("AllowAll");
 app.UseHttpsRedirection();
+app.UseCors("AllowAll");
 app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
