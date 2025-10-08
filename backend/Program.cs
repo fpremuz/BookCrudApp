@@ -11,8 +11,7 @@ builder.Services.AddControllers();
 
 // Add Entity Framework with environment variable substitution
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+
 if (!string.IsNullOrEmpty(connectionString))
 {
     // Replace environment variables in connection string
@@ -37,29 +36,18 @@ builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            policy.WithOrigins(
-                    "http://localhost:3000",
-                    "https://bookcrudapp-frontend.vercel.app",
-                    "https://*.vercel.app"
-                  )
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
-});
+policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
 
 var app = builder.Build();
 
 app.UseCors("AllowFrontend");
-app.UseSwagger();
-app.UseSwaggerUI();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
 {
     app.UseSwagger();
     app.UseSwaggerUI();
