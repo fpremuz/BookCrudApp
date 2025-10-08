@@ -310,6 +310,105 @@ git push origin main
 # - Configure environment variables
 ```
 
+### ✅ Render + Neon Deployment (Final Configuration)
+
+This project is deployed on **Render** using a **Neon PostgreSQL** database.
+
+#### 1. Database Setup (Neon)
+
+- Go to [https://neon.tech](https://neon.tech)
+- Create a new project → it automatically creates a database and user.
+- Click “Connect to database” and copy your connection info.
+- Use the **“Reset password”** button to get a password for your DB user.
+- Example connection details:
+   Host: ep-green-mode-adxzf1ke-pooler.c-2.us-east-1.aws.neon.tech
+   Port: 5432
+   Database: neondb
+   Username: neondb_owner
+   Password: npg_***********
+  #### 2. Environment Variables (Render)
+
+Add these environment variables in Render → **Environment → Environment Variables**:
+
+| Key | Value |
+|-----|--------|
+| ASPNETCORE_ENVIRONMENT | Production |
+| ASPNETCORE_URLS | http://0.0.0.0:8080 |
+| DB_HOST | ep-green-mode-adxzf1ke-pooler.c-2.us-east-1.aws.neon.tech |
+| DB_PORT | 5432 |
+| DB_NAME | neondb |
+| DB_USER | neondb_owner |
+| DB_PASSWORD | npg_yourpassword |
+
+#### 3. Code Update (appsettings.json)
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD};SSL Mode=Require;Trust Server Certificate=true"
+  },
+  "Kestrel": {
+    "Endpoints": {
+      "Http": {
+        "Url": "http://0.0.0.0:8080"
+      }
+    }
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}
+
+4. Deployment Commands
+- git add backend/appsettings.json
+- git commit -m "Finalize Render deployment config"
+- git push origin main
+Render will automatically detect and redeploy your backend.
+Once deployed, your API will be live at: https://bookcrudapp-3wpi.onrender.com
+You can test it by visiting: https://bookcrudapp-3wpi.onrender.com/books
+
+If it returns [] (empty array), your backend and database are connected successfully.
+
+---
+
+## ⚛️ Next — Connecting & Deploying the Frontend on Vercel
+
+Now that your backend is live, let’s link your frontend:
+
+### 1️⃣ Update your frontend API URL
+
+In your React project (inside `frontend/.env`), add:
+
+REACT_APP_API_URL=https://bookcrudapp-3wpi.onrender.com
+
+Then in your code (wherever you fetch books), use:
+
+```js
+const API_URL = import.meta.env.VITE_API_URL || process.env.REACT_APP_API_URL;
+
+fetch(`${API_URL}/books`)
+  .then(res => res.json())
+  .then(data => console.log(data));
+
+Or if you’re using Create React App (not Vite):
+const API_URL = process.env.REACT_APP_API_URL;
+
+2️⃣ Deploy frontend to Vercel
+
+Go to https://vercel.com
+Click “New Project” → Import from GitHub
+Select your BookCrudApp repo
+Set the root directory to /frontend
+Add environment variables:
+   REACT_APP_API_URL = https://bookcrudapp-3wpi.onrender.com
+Click Deploy
+
+In a minute or two, you’ll get a live URL like: https://bookcrudapp-frontend.vercel.app
+
 #### Frontend (Vercel)
 ```bash
 # 1. Install Vercel CLI
