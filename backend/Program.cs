@@ -41,7 +41,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
     {
         policy
-            .AllowAnyOrigin()
+            .WithOrigins("https://bookcrudapp-lln4.onrender.com/")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -50,6 +50,8 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors("AllowAll");
+app.UseHttpsRedirection();
+app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
@@ -61,8 +63,6 @@ else
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseAuthorization();
 
 app.MapControllers();
 
