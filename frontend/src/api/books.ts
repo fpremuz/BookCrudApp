@@ -10,7 +10,7 @@ const getApiBaseUrl = (): string => {
   return apiUrl;
 };
 
-const API_BASE_URL = getApiBaseUrl();
+const API_BASE_URL = `${getApiBaseUrl()}/books`;
 
 export const booksApi = {
   // Get all books
