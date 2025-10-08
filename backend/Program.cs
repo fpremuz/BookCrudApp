@@ -41,7 +41,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
     {
         policy
-            .WithOrigins("https://bookcrudapp-lln4.onrender.com/")
+            .WithOrigins("https://bookcrudapp-3wpi.onrender.com")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
